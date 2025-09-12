@@ -223,7 +223,7 @@
                     <div class="card-body">
                         <p class="text-muted small">Access this project via API:</p>
                         <div class="input-group mb-2">
-                            <input type="text" class="form-control" value="{{ request.build_absolute_uri }}/api/projects/{{ project.id }}/" readonly>
+                            <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}/api/projects/{{ project.id }}/" readonly>
                             <button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard(this.previousElementSibling.value)">
                                 <i class="fas fa-copy"></i>
                             </button>
