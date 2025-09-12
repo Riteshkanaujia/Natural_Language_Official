@@ -1,0 +1,158 @@
+{% extends 'application/base_template.html' %}
+
+{% block title %}Gallery - Audio Wave Studio{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="text-primary">
+                        <i class="fas fa-th-large"></i> Project Gallery
+                    </h1>
+                    <p class="text-secondary">
+                        Total projects: {{ total_projects }}
+                    </p>
+                </div>
+                <a href="{% url 'create_project' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus-circle"></i> Create New Project
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if page_obj %}
+        <div class="row">
+            {% for project in page_obj %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 text-primary">{{ project.name }}</h6>
+                            {% if project.is_processing %}
+                                <span class="processing-indicator" title="Processing..."></span>
+                            {% else %}
+                                <i class="fas fa-check-circle text-success"></i>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-wave-square"></i> {{ project.get_wave_type_display }}
+                                </small>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="far fa-clock"></i> {{ project.created_at|date:"M d, Y H:i" }}
+                                </small>
+                            </div>
+                            
+                            {% if project.description %}
+                                <p class="card-text text-secondary">
+                                    {{ project.description|truncatewords:15 }}
+                                </p>
+                            {% endif %}
+                            
+                            <!-- Color indicators -->
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Colors:</small>
+                                <span class="color-swatch" style="background-color: {{ project.background_color }}" title="Background"></span>
+                                <span class="color-swatch" style="background-color: {{ project.positive_color }}" title="Positive"></span>
+                                <span class="color-swatch" style="background-color: {{ project.negative_color }}" title="Negative"></span>
+                            </div>
+                            
+                            <!-- Preview visualization if available -->
+                            {% if project.final_drawing %}
+                                <div class="audio-visualization text-center mb-3">
+                                    <img src="{{ project.final_drawing.url }}" 
+                                         alt="Wave visualization" 
+                                         class="img-fluid" 
+                                         style="max-height: 100px;">
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer">
+                            <div class="btn-group w-100" role="group">
+                                <a href="{% url 'project_detail' project.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                {% if not project.is_processing %}
+                                    <a href="{% url 'visualize_project' project.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-chart-line"></i> Visualize
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'delete_project' project.id %}" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1" style="background: rgba(0,0,0,0.7); border-color: var(--text-primary); color: var(--text-primary);">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" style="background: rgba(0,0,0,0.7); border-color: var(--text-primary); color: var(--text-primary);">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link" style="background: var(--text-primary); border-color: var(--text-primary); color: black;">
+                            {{ page_obj.number }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" style="background: rgba(0,0,0,0.7); border-color: var(--text-primary); color: var(--text-primary);">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" style="background: rgba(0,0,0,0.7); border-color: var(--text-primary); color: var(--text-primary);">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-music fa-5x text-secondary mb-3"></i>
+            <h3 class="text-secondary">No projects yet</h3>
+            <p class="text-muted">Create your first audio wave visualization project!</p>
+            <a href="{% url 'create_project' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus-circle"></i> Create Your First Project
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-refresh for processing projects
+$(document).ready(function() {
+    // Check if there are any processing projects
+    if ($('.processing-indicator').length > 0) {
+        setTimeout(function() {
+            location.reload();
+        }, 5000); // Refresh every 5 seconds
+    }
+});
+</script>
+{% endblock %}
