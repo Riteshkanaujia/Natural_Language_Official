@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Audio Wave Studio{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #00ff00;
+            --text-secondary: #00ffff;
+            --accent: #ff00ff;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: rgba(26, 26, 26, 0.95) !important;
+            border-bottom: 2px solid var(--text-primary);
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar-brand {
+            color: var(--text-primary) !important;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            color: #ffffff !important;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-primary) !important;
+        }
+        
+        .card {
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid var(--text-primary);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .card-header {
+            background: rgba(0, 255, 0, 0.1);
+            border-bottom: 1px solid var(--text-primary);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--text-primary), var(--text-secondary));
+            border: none;
+            color: #000000;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, var(--text-secondary), var(--text-primary));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--text-primary);
+            color: #000000;
+        }
+        
+        .form-control, .form-select {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid var(--text-primary);
+            color: #ffffff;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: rgba(26, 26, 26, 0.9);
+            border-color: var(--text-secondary);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            color: #ffffff;
+        }
+        
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .text-primary {
+            color: var(--text-primary) !important;
+        }
+        
+        .text-secondary {
+            color: var(--text-secondary) !important;
+        }
+        
+        .alert {
+            border: 1px solid;
+            border-radius: 8px;
+        }
+        
+        .alert-success {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+        
+        .alert-danger {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: #ff0000;
+            color: #ff6666;
+        }
+        
+        .alert-info {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+        }
+        
+        /* Processing indicator animation */
+        .processing-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--text-primary);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Color swatches */
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #666;
+            margin-right: 5px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.2);
+            border-color: var(--text-primary);
+        }
+        
+        /* Audio visualization styling */
+        .audio-visualization img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--text-primary);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .audio-visualization img:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            transform: scale(1.02);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'gallery' %}">
+                <i class="fas fa-wave-square"></i> Audio Wave Studio
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'gallery' %}">
+                            <i class="fas fa-th-large"></i> Gallery
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create_project' %}">
+                            <i class="fas fa-plus-circle"></i> Create Project
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-code"></i> API
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="/api/projects/" target="_blank">
+                                <i class="fas fa-list"></i> All Projects
+                            </a></li>
+                            <li><a class="dropdown-item" href="/admin/" target="_blank">
+                                <i class="fas fa-cog"></i> Admin Panel
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="py-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-refresh for processing projects
+        $(document).ready(function() {
+            if ($('.processing-indicator').length > 0) {
+                setTimeout(function() {
+                    location.reload();
+                }, 5000);
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
