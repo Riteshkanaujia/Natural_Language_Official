@@ -16,8 +16,8 @@
                 <div class="card-body text-center">
                     <div class="mb-4">
                         <i class="fas fa-trash fa-4x text-danger mb-3"></i>
-                        <h4 class="text-primary">Delete "{{ project.name }}"?</h4>
-                        <p class="text-muted">
+                        <h4 class="text-danger">Delete "{{ project.name }}"?</h4>
+                        <p class="text-danger">
                             This action cannot be undone. All associated files, visualizations, 
                             and data will be permanently deleted.
                         </p>
@@ -38,24 +38,24 @@
                     
                     <!-- Files that will be deleted -->
                     <div class="alert alert-danger text-start">
-                        <h6 class="text-dark mb-2">Files to be deleted:</h6>
-                        <ul class="list-unstyled mb-0 text-dark small">
+                        <h6 class="text-alert mb-2">Files to be deleted:</h6>
+                        <ul class="list-unstyled mb-0 text-light small">
                             {% if project.original_file %}
-                                <li><i class="fas fa-music"></i> Original audio file</li>
+                                <li><i class="fas fa-music text-danger"></i> : Original audio file</li>
                             {% endif %}
                             {% if project.modified_file %}
-                                <li><i class="fas fa-music"></i> Modified audio file</li>
+                                <li><i class="fas fa-music text-danger"></i> : Modified audio file</li>
                             {% endif %}
                             {% if project.final_drawing %}
-                                <li><i class="fas fa-image"></i> Final drawing visualization</li>
+                                <li><i class="fas fa-image text-danger"></i> : Final drawing visualization</li>
                             {% endif %}
                             {% if project.natural_lang %}
-                                <li><i class="fas fa-image"></i> Natural language visualization</li>
+                                <li><i class="fas fa-image text-danger"></i> : Natural language visualization</li>
                             {% endif %}
                             {% if project.wave_comparison %}
-                                <li><i class="fas fa-image"></i> Wave comparison visualization</li>
+                                <li><i class="fas fa-image text-danger"></i> : Wave comparison visualization</li>
                             {% endif %}
-                            <li><i class="fas fa-database"></i> All project metadata and settings</li>
+                            <li><i class="fas fa-database text-danger"></i> : All project metadata and settings</li>
                         </ul>
                     </div>
                     

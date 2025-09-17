@@ -60,7 +60,7 @@ A comprehensive Django web application that integrates the original audio proces
 ## Directory Structure
 
 ```
-hackathon/
+Project-Wave/
 ├── application/
 │   ├── models.py          # AudioProject model
 │   ├── views.py           # Web views and API endpoints
@@ -77,7 +77,7 @@ hackathon/
 │           └── confirm_delete.html
 ├── media/                 # Uploaded and generated files
 ├── static/               # Static assets
-├── hackathon/
+├── Project-Wave/
 │   ├── settings.py       # Django configuration
 │   └── urls.py          # URL routing
 └── requirements.txt      # Python dependencies

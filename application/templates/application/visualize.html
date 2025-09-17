@@ -72,24 +72,8 @@
         <div class="col-12">
             <div class="control-panel">
                 <div class="row align-items-center">
-                    <!-- View Mode -->
-                    <div class="col-md-2">
-                        <label for="viewMode" class="form-label">View Mode:</label>
-                        <select id="viewMode" class="form-select form-select-sm" onchange="updateVisualization()">
-                            <option value="original">Original Wave</option>
-                            <option value="modified">Modified Wave</option>
-                            <option value="comparison">Comparison</option>
-                        </select>
-                        <small class="text-muted">
-                            <strong>Envelope Editor:</strong> Interactive mode to modify wave amplitude<br>
-                            <strong>Original:</strong> Shows unmodified waveform<br>
-                            <strong>Modified:</strong> Shows envelope-modified waveform<br>
-                            <strong>Comparison:</strong> Shows both overlaid
-                        </small>
-                    </div>
-                    
                     <!-- Color Controls -->
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label class="form-label">Colors:</label>
                         <div class="d-flex gap-2">
                             <input type="color" id="bgColor" class="color-input" value="{{ project.background_color }}" onchange="updateColors()" title="Background">
@@ -106,7 +90,7 @@
                                 <i class="fas fa-search-minus"></i>
                             </button>
                             <input type="range" id="zoomSlider" class="form-range" min="0.1" max="10" step="0.1" value="1" 
-                                   onchange="setZoom(this.value)" style="width: 100px;">
+                                   onchange="setZoom(this.value)" style="width: 120px;">
                             <span id="zoomDisplay" class="zoom-display">100%</span>
                             <button class="btn btn-sm btn-outline-secondary" onclick="zoomIn()" title="Zoom In">
                                 <i class="fas fa-search-plus"></i>
@@ -117,16 +101,14 @@
                         </div>
                     </div>
                     
-                    <!-- Pan Controls -->
-                    <div class="col-md-3">
+                    <!-- Pan Controls with Slider -->
+                    <div class="col-md-4">
                         <label class="form-label">Pan:</label>
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn btn-outline-secondary" onclick="panLeft()" title="Pan Left">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary" onclick="panRight()" title="Pan Right">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted small">Left</span>
+                            <input type="range" id="panSlider" class="form-range" min="0" max="100" step="1" value="0" 
+                                   onchange="setPan(this.value)" style="width: 120px;" title="Pan Position">
+                            <span class="text-muted small">Right</span>
                         </div>
                     </div>
                 </div>
@@ -138,20 +120,11 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="canvas-container">
-                <h5 class="p-2 mb-0 bg-light border-bottom">Waveform Display</h5>
-                <canvas id="waveformCanvas" width="800" height="400"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="canvas-container">
                 <h5 class="p-2 mb-0 bg-light border-bottom">
                     Interactive Envelope Editor
                     <small class="text-muted ms-2">Click and drag to modify the envelope. Press 'P' to preview, 'R' to reset, 'U' to undo.</small>
                 </h5>
-                <canvas id="envelopeCanvas" width="800" height="200"></canvas>
+                <canvas id="envelopeCanvas" width="800" height="400"></canvas>
             </div>
         </div>
     </div>
@@ -252,7 +225,7 @@
 {% block extra_js %}
 <script>
 // Global variables - Replicating the original script exactly
-let canvas, ctx, envelopeCanvas, envelopeCtx;
+let envelopeCanvas, envelopeCtx;
 let audioData = [];
 let envelopePos = [];
 let envelopeNeg = [];
@@ -262,7 +235,6 @@ let lastStatePos = null;
 let lastStateNeg = null;
 let zoomLevel = 1;
 let panOffset = 0;
-let viewMode = 'envelope';
 let sampleRate = 44100;
 
 // Drawing state variables (matching original script)
@@ -285,8 +257,6 @@ $(document).ready(function() {
 });
 
 function initializeCanvas() {
-    canvas = document.getElementById('waveformCanvas');
-    ctx = canvas.getContext('2d');
     envelopeCanvas = document.getElementById('envelopeCanvas');
     envelopeCtx = envelopeCanvas.getContext('2d');
     
@@ -311,11 +281,9 @@ function initializeCanvas() {
 }
 
 function resizeCanvas() {
-    const container = canvas.parentElement;
-    canvas.width = container.clientWidth - 4; // Account for borders
-    canvas.height = 400;
+    const container = envelopeCanvas.parentElement;
     envelopeCanvas.width = container.clientWidth - 4;
-    envelopeCanvas.height = 200;
+    envelopeCanvas.height = 400;
     
     if (audioData.length > 0) {
         updateVisualization();
@@ -343,6 +311,7 @@ function loadAudioData() {
             }
             
             updateVisualization();
+            updatePanSlider(); // Initialize pan slider state
             showToast('Audio data loaded successfully', 'success');
         })
         .catch(error => {
@@ -471,9 +440,7 @@ function onKeyPress(event) {
 }
 
 function updateVisualization() {
-    viewMode = document.getElementById('viewMode').value;
-    drawWaveform();
-    drawEnvelope(); // Always draw the envelope in the envelope canvas
+    drawEnvelope(); // Only draw the envelope since we removed the waveform canvas
 }
 
 function drawWaveform() {
@@ -561,7 +528,7 @@ function drawEnvelope() {
     
     // Draw positive envelope
     envelopeCtx.strokeStyle = projectData.posColor;
-    envelopeCtx.lineWidth = 2;
+    envelopeCtx.lineWidth = 3;
     envelopeCtx.beginPath();
     for (let i = 0; i < envelopePos.length; i++) {
         const x = i * scaleX - panOffset;
@@ -578,7 +545,7 @@ function drawEnvelope() {
     
     // Draw negative envelope
     envelopeCtx.strokeStyle = projectData.negColor;
-    envelopeCtx.lineWidth = 2;
+    envelopeCtx.lineWidth = 3;
     envelopeCtx.beginPath();
     for (let i = 0; i < envelopeNeg.length; i++) {
         const x = i * scaleX - panOffset;
@@ -772,6 +739,7 @@ function zoomOut() {
 function resetZoom() {
     setZoom(1);
     panOffset = 0;
+    updatePanSlider();
     updateVisualization();
 }
 
@@ -785,17 +753,39 @@ function setZoom(level) {
         zoomDisplay.textContent = `${(zoomLevel * 100).toFixed(0)}%`;
     }
     
-    // Adjust pan offset to keep center in view
+    // Adjust pan offset to keep center in view and update slider
     const maxPan = Math.max(0, (envelopeCanvas.width * (zoomLevel - 1)));
     panOffset = Math.max(0, Math.min(maxPan, panOffset));
+    updatePanSlider();
     
     updateVisualization();
 }
 
-// Pan functions
+// New pan slider function
+function setPan(percentage) {
+    const maxPan = Math.max(0, (envelopeCanvas.width * (zoomLevel - 1)));
+    panOffset = (percentage / 100) * maxPan;
+    updateVisualization();
+}
+
+function updatePanSlider() {
+    const maxPan = Math.max(0, (envelopeCanvas.width * (zoomLevel - 1)));
+    const panSlider = document.getElementById('panSlider');
+    if (panSlider && maxPan > 0) {
+        panSlider.value = (panOffset / maxPan) * 100;
+        panSlider.disabled = false;
+    } else if (panSlider) {
+        panSlider.value = 0;
+        panSlider.disabled = true;
+    }
+}
+
+// Pan functions - updated to work with slider
 function panLeft() {
     const panStep = envelopeCanvas.width * 0.1;
+    const maxPan = Math.max(0, (envelopeCanvas.width * (zoomLevel - 1)));
     panOffset = Math.max(0, panOffset - panStep);
+    updatePanSlider();
     updateVisualization();
 }
 
@@ -803,38 +793,17 @@ function panRight() {
     const panStep = envelopeCanvas.width * 0.1;
     const maxPan = Math.max(0, (envelopeCanvas.width * (zoomLevel - 1)));
     panOffset = Math.min(maxPan, panOffset + panStep);
+    updatePanSlider();
     updateVisualization();
 }
 
 // Export functions
 function exportCanvas(format) {
     if (format === 'png') {
-        // Create a combined canvas with both waveform and envelope
-        const combinedCanvas = document.createElement('canvas');
-        const combinedCtx = combinedCanvas.getContext('2d');
-        
-        combinedCanvas.width = canvas.width;
-        combinedCanvas.height = canvas.height + envelopeCanvas.height + 40; // Add some spacing
-        
-        // Set white background
-        combinedCtx.fillStyle = '#ffffff';
-        combinedCtx.fillRect(0, 0, combinedCanvas.width, combinedCanvas.height);
-        
-        // Add title
-        combinedCtx.fillStyle = '#000000';
-        combinedCtx.font = '16px Arial';
-        combinedCtx.fillText(`Project: ${projectData.id} - Visualization Export`, 10, 25);
-        
-        // Draw waveform canvas
-        combinedCtx.drawImage(canvas, 0, 40);
-        
-        // Draw envelope canvas
-        combinedCtx.drawImage(envelopeCanvas, 0, canvas.height + 40);
-        
-        // Export
+        // Export just the envelope canvas
         const link = document.createElement('a');
-        link.download = `project_${projectData.id}_visualization.png`;
-        link.href = combinedCanvas.toDataURL();
+        link.download = `project_${projectData.id}_envelope.png`;
+        link.href = envelopeCanvas.toDataURL();
         link.click();
         showToast('PNG exported successfully!', 'success');
     } else if (format === 'svg') {
@@ -847,7 +816,7 @@ function exportCanvas(format) {
         const url = URL.createObjectURL(blob);
         
         const link = document.createElement('a');
-        link.download = `project_${projectData.id}_visualization.svg`;
+        link.download = `project_${projectData.id}_envelope.svg`;
         link.href = url;
         link.click();
         
@@ -858,29 +827,47 @@ function exportCanvas(format) {
 }
 
 function createSVGVisualization() {
-    const width = canvas.width;
-    const height = canvas.height + envelopeCanvas.height + 40;
+    const width = envelopeCanvas.width;
+    const height = envelopeCanvas.height + 40;
     
     let svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="white"/>
-  <text x="10" y="25" font-family="Arial" font-size="16" fill="black">Project: ${projectData.id} - Visualization Export</text>
+  <text x="10" y="25" font-family="Arial" font-size="16" fill="black">Project: ${projectData.id} - Envelope Visualization Export</text>
   <g transform="translate(0, 40)">`;
     
-    // Add waveform data as SVG paths
+    // Add envelope data as SVG paths
     if (audioData.length > 0) {
         const scaleX = width / audioData.length;
-        const centerY = canvas.height / 2;
+        const centerY = envelopeCanvas.height / 2;
         const scaleY = centerY * 0.8;
         
-        // Original waveform
+        // Original waveform (faint)
         svg += `<path d="M`;
         for (let i = 0; i < audioData.length; i++) {
             const x = i * scaleX;
             const y = centerY - audioData[i] * scaleY;
             svg += `${i === 0 ? '' : 'L'}${x},${y}`;
         }
-        svg += `" stroke="#4080ff" stroke-width="2" fill="none"/>`;
+        svg += `" stroke="rgba(64,128,255,0.15)" stroke-width="1" fill="none"/>`;
+        
+        // Positive envelope
+        svg += `<path d="M`;
+        for (let i = 0; i < envelopePos.length; i++) {
+            const x = i * scaleX;
+            const y = centerY - (envelopePos[i] + offset) * scaleY;
+            svg += `${i === 0 ? '' : 'L'}${x},${y}`;
+        }
+        svg += `" stroke="${projectData.posColor}" stroke-width="3" fill="none"/>`;
+        
+        // Negative envelope
+        svg += `<path d="M`;
+        for (let i = 0; i < envelopeNeg.length; i++) {
+            const x = i * scaleX;
+            const y = centerY - (envelopeNeg[i] + offset) * scaleY;
+            svg += `${i === 0 ? '' : 'L'}${x},${y}`;
+        }
+        svg += `" stroke="${projectData.negColor}" stroke-width="3" fill="none"/>`;
     }
     
     svg += `  </g>

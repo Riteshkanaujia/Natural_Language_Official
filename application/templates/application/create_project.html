@@ -22,6 +22,9 @@
                             <div class="col-md-6">
                                 <label for="name" class="form-label text-primary">Project Name</label>
                                 <input type="text" class="form-control" id="name" name="name" required>
+                                <div class="form-text text-light">
+                                    Choose a descriptive name for your audio visualization project
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="wave_type" class="form-label text-primary">Audio Source</label>
@@ -37,14 +40,17 @@
                         
                         <div class="mb-4">
                             <label for="description" class="form-label text-primary">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional description of your project"></textarea>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <div class="form-text text-light">
+                                Provide additional details about your project (optional)
+                            </div>
                         </div>
                         
                         <!-- Audio Upload Section -->
                         <div id="uploadSection" class="mb-4">
                             <label for="audio_file" class="form-label text-primary">Audio File</label>
                             <input type="file" class="form-control" id="audio_file" name="audio_file" accept=".wav,.mp3,.flac">
-                            <div class="form-text text-muted">
+                            <div class="form-text text-light">
                                 Supported formats: WAV, MP3, FLAC. Max size: 50MB
                             </div>
                         </div>
@@ -107,7 +113,7 @@
                                         </span>
                                     {% endfor %}
                                 </div>
-                                <small class="text-muted">Click a color to apply it to the selected color field</small>
+                                <small class="text-light">Click a color to apply it to the selected color field</small>
                             </div>
                         </div>
                         

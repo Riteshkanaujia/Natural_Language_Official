@@ -9,7 +9,7 @@ import sys
 import django
 
 # Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'hackathon.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Project-Wave.settings')
 django.setup()
 
 from application.models import AudioProject

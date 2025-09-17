@@ -204,7 +204,7 @@
                                 <span class="color-swatch" style="background-color: {{ project.positive_color }}" title="Positive: {{ project.positive_color }}"></span>
                                 <span class="color-swatch" style="background-color: {{ project.negative_color }}" title="Negative: {{ project.negative_color }}"></span>
                             </div>
-                            <small class="text-muted">
+                            <small class="text-light">
                                 BG: {{ project.background_color }} | 
                                 POS: {{ project.positive_color }} | 
                                 NEG: {{ project.negative_color }}
@@ -221,7 +221,7 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted small">Access this project via API:</p>
+                        <p class="text-light small">Access this project via API:</p>
                         <div class="input-group mb-2">
                             <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}/api/projects/{{ project.id }}/" readonly>
                             <button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard(this.previousElementSibling.value)">
