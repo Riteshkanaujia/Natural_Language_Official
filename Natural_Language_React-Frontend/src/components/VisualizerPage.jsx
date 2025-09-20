@@ -203,7 +203,7 @@ export default function VisualizerPage() {
     setPrevIdx(null);
   };
 
-  // Core drawing function - replicating Django's update_drawing method
+  // Core drawing function - replicating Django's update_drawing method EXACTLY
   const updateDrawing = (event) => {
     const canvas = envelopeRef.current;
     if (!canvas || !audioData) return;
@@ -218,7 +218,7 @@ export default function VisualizerPage() {
     const scaleY = centerY * 0.8;
     
     const idx = Math.floor((mouseX + pan) * scaleX);
-    const amp = (centerY - mouseY) / scaleY;
+    const amp = (centerY - mouseY) / scaleY; // This gives signed amplitude
     
     if (idx < 0 || idx >= numPoints) return;
     
@@ -226,49 +226,39 @@ export default function VisualizerPage() {
     const newEnvPos = [...envelopePos];
     const newEnvNeg = [...envelopeNeg];
     
-    // Choose envelope based on which side of center we're on (like Django)
-    const isUpperHalf = mouseY < centerY;
+    // Choose envelope based on amplitude sign (EXACTLY like Django)
+    const targetEnvelope = amp >= 0 ? newEnvPos : newEnvNeg;
     
-    // Interpolation between points if drawing continuously
+    // Interpolation between points if drawing continuously - EXACTLY like Django
     if (prevIdx !== null && idx !== prevIdx) {
-      const startIdx = Math.min(prevIdx, idx);
-      const endIdx = Math.max(prevIdx, idx);
-      
-      // Get the envelope values at start and end points
+      let startIdx = prevIdx;
+      let endIdx = idx;
       let startVal, endVal;
       
-      if (isUpperHalf) {
-        // Upper half - positive envelope
-        startVal = prevIdx < idx ? newEnvPos[prevIdx] : Math.abs(amp);
-        endVal = prevIdx < idx ? Math.abs(amp) : newEnvPos[prevIdx];
+      if (startIdx > endIdx) {
+        [startIdx, endIdx] = [endIdx, startIdx];
+        startVal = amp;
+        endVal = targetEnvelope[prevIdx];
       } else {
-        // Lower half - negative envelope  
-        startVal = prevIdx < idx ? newEnvNeg[prevIdx] : Math.abs(amp);
-        endVal = prevIdx < idx ? Math.abs(amp) : newEnvNeg[prevIdx];
+        startVal = targetEnvelope[prevIdx];
+        endVal = amp;
       }
       
-      // Interpolate between start and end points
+      // Linear interpolation between points
       for (let i = startIdx; i <= endIdx; i++) {
         const t = endIdx === startIdx ? 0 : (i - startIdx) / (endIdx - startIdx);
-        const interpolatedVal = startVal + t * (endVal - startVal);
+        const interpolatedValue = startVal + t * (endVal - startVal);
         
-        if (isUpperHalf) {
-          // Drawing in upper half - modify positive envelope
-          newEnvPos[i] = Math.max(0, Math.min(1, interpolatedVal));
+        // Store values in correct envelope based on their sign
+        if (interpolatedValue >= 0) {
+          newEnvPos[i] = interpolatedValue;
         } else {
-          // Drawing in lower half - modify negative envelope
-          newEnvNeg[i] = Math.max(0, Math.min(1, interpolatedVal));
+          newEnvNeg[i] = interpolatedValue;
         }
       }
     } else {
-      // Single point - no interpolation needed
-      if (isUpperHalf) {
-        // Upper half - positive envelope
-        newEnvPos[idx] = Math.max(0, Math.min(1, Math.abs(amp)));
-      } else {
-        // Lower half - negative envelope
-        newEnvNeg[idx] = Math.max(0, Math.min(1, Math.abs(amp)));
-      }
+      // Single point - store directly in the target envelope
+      targetEnvelope[idx] = amp;
     }
     
     setPrevIdx(idx);
@@ -409,13 +399,13 @@ export default function VisualizerPage() {
     }
     ctx.stroke();
 
-    // Draw negative envelope (like Django script)
+    // Draw negative envelope (EXACTLY like Django script)
     ctx.strokeStyle = project?.negative_color || '#ef4444';
     ctx.lineWidth = 3;
     ctx.beginPath();
     for (let i = 0; i < envelopeNeg.length; i++) {
       const x = i * scaleX - pan;
-      const y = centerY + (envelopeNeg[i] + offset) * scaleY; // Note: + for negative envelope
+      const y = centerY - (envelopeNeg[i] + offset) * scaleY; // Same formula as positive!
       if (x >= 0 && x <= canvas.width) {
         if (i === 0 || (i > 0 && (i-1) * scaleX - pan < 0)) {
           ctx.moveTo(x, y);

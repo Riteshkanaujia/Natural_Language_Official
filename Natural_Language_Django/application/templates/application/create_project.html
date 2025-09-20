@@ -114,9 +114,9 @@
                                         <i class="fas fa-cloud-upload-alt text-primary mb-3" style="font-size: 3rem;"></i>
                                         <h6 class="text-primary mb-2">Drag & Drop Your Audio File</h6>
                                         <p class="text-secondary mb-3">or click to browse files</p>
-                                        <input type="file" class="form-control d-none" id="audio_file" name="audio_file" 
-                                               accept=".wav,.mp3,.flac">
-                                        <button type="button" class="btn btn-outline-primary" onclick="$('#audio_file').click()">
+                                        <input type="file" class="form-control" id="audio_file" name="audio_file" 
+                                               accept=".wav,.mp3,.flac" style="opacity: 0.1; height: 20px; margin: 5px;">
+                                        <button type="button" class="btn btn-outline-primary" onclick="triggerFileInput()">
                                             <i class="fas fa-folder-open me-2"></i>Choose File
                                         </button>
                                         <div class="mt-3">
@@ -482,6 +482,16 @@
         // Setup drag and drop
         setupDragAndDrop();
         
+        // Fallback file input handler (in case jQuery fails)
+        const fileInput = document.getElementById('audio_file');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    handleFileSelection(this.files[0]);
+                }
+            });
+        }
+        
         // Setup form validation
         setupFormValidation();
         
@@ -557,7 +567,7 @@
 
         // Click to upload
         $uploadArea.on('click', function() {
-            $fileInput.click();
+            triggerFileInput();
         });
 
         // File input change
@@ -584,6 +594,10 @@
             return;
         }
 
+        // Store the selected file for validation
+        selectedFile = file;
+        console.log('File selected and stored:', file.name);
+
         // Update UI
         $('#fileName').text(file.name);
         $('#fileSize').text(formatFileSize(file.size));
@@ -599,15 +613,32 @@
         
         showNotification(`File "${file.name}" selected successfully`, 'success');
     }
+    
+    function triggerFileInput() {
+        // Robust file input trigger that works with or without jQuery
+        console.log('triggerFileInput called');
+        const fileInput = document.getElementById('audio_file');
+        if (fileInput) {
+            console.log('File input found, triggering click');
+            fileInput.click();
+        } else if (typeof $ !== 'undefined') {
+            console.log('Using jQuery fallback');
+            $('#audio_file').click();
+        } else {
+            console.error('No file input found and jQuery not available');
+        }
+    }
 
     function clearFile() {
         $('#audio_file').val('');
+        selectedFile = null; // Reset the selected file
+        console.log('File cleared, selectedFile reset');
         $('#fileInfo').addClass('d-none');
         $('#uploadArea .upload-content').html(`
             <i class="fas fa-cloud-upload-alt text-primary mb-3" style="font-size: 3rem;"></i>
             <h6 class="text-primary mb-2">Drag & Drop Your Audio File</h6>
             <p class="text-secondary mb-3">or click to browse files</p>
-            <button type="button" class="btn btn-outline-primary" onclick="$('#audio_file').click()">
+            <button type="button" class="btn btn-outline-primary" onclick="triggerFileInput()">
                 <i class="fas fa-folder-open me-2"></i>Choose File
             </button>
             <div class="mt-3">
@@ -694,11 +725,26 @@
             }
         } else if (currentStep === 2) {
             const waveType = $('#wave_type').val();
+            console.log('Validating step 2, wave_type:', waveType);
+            
             if (waveType === 'uploaded') {
-                const hasFile = $('#audio_file')[0].files.length > 0;
+                const fileInput = document.getElementById('audio_file');
+                const hasFileInInput = fileInput && fileInput.files && fileInput.files.length > 0;
+                const hasSelectedFile = selectedFile !== null;
+                const hasFile = hasFileInInput || hasSelectedFile;
+                
+                console.log('File input:', fileInput);
+                console.log('Has files in input:', hasFileInInput);
+                console.log('Has selected file:', hasSelectedFile);
+                console.log('Selected file:', selectedFile);
+                console.log('Overall has file:', hasFile);
+                
                 if (!hasFile) {
                     showNotification('Please select an audio file', 'warning');
                     isValid = false;
+                } else {
+                    const fileName = hasFileInInput ? fileInput.files[0].name : selectedFile.name;
+                    console.log('File validation passed:', fileName);
                 }
             }
         }
