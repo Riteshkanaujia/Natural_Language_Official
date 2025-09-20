@@ -1,29 +1,35 @@
 import { useState } from "react";
 import { motion } from "framer-motion"; // ✅ correct import
-
+import image4 from '../assets/image4.jpeg'
+import image5 from '../assets/image5.jpeg'
+import  image6 from '../assets/image6.jpeg'
+import image7 from '../assets/image7.jpeg'
+import image8 from '../assets/image8.jpeg'
+import image9 from '../assets/image9.jpeg'
 const galleryImages = [
   {
-    src: "https://images.unsplash.com/photo-1475906067486-6c5bd3aa9c9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: image4,
     caption: "Advanced Research Technology",
+    
   },
   {
-    src: "https://images.unsplash.com/photo-1652806724292-381ff63977b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: image5,
     caption: "Night Sky Observations",
   },
   {
-    src: "https://images.unsplash.com/photo-1745697213293-21d6c972ac1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: image6,
     caption: "Research Facility Operations",
   },
   {
-    src: "https://images.unsplash.com/photo-1653189677831-f0299b16ddb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: image7,
     caption: "Satellite Dish Array",
   },
   {
-    src: "https://images.unsplash.com/photo-1657344956545-8f49e1b1f661?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: image8,
     caption: "Space Exploration Equipment",
   },
   {
-    src: "https://images.unsplash.com/photo-1694230155228-cdde50083573?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    src: image9,
     caption: "Futuristic Laboratory",
   },
 ];

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import image3 from '../assets/image3.jpeg'
 
 export default function AboutSection() {
   return (
@@ -13,26 +14,103 @@ export default function AboutSection() {
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <h2 className="text-4xl md:text-5xl text-black mb-6">
+            <h2 className="text-4xl md:text-5xl text-black mb-6 font-bold ">
               About{" "}
               <span style={{ color: "var(--neon-blue)" }}>Arecibo 2.0</span>
             </h2>
 
-            <p className="text-lg text-black leading-relaxed">
-              Arecibo 2.0 represents the future of radio astronomy and space
-              exploration. Building upon the legacy of the original Arecibo
-              Observatory, this next-generation project combines cutting-edge
-              technology with innovative design to push the boundaries of our
-              understanding of the universe.
-            </p>
+            
+              <h1 className="text-3xl font-bold text-black mt-[60px]">
+                📡 The Arecibo Message
+              </h1>
 
-            <p className="text-lg text-black leading-relaxed">
-              Our advanced radio telescope array will enable unprecedented
-              observations of distant galaxies, pulsars, and potentially
-              habitable exoplanets. With enhanced sensitivity and resolution,
-              Arecibo 2.0 will serve as humanity's premier window into the
-              cosmos.
-            </p>
+              {/* Intro */}
+              <ul className="list-disc list-inside space-y-2">
+                <li>
+                  A <span className="text-black font-bold">radio message</span> sent from the
+                  Arecibo telescope to star{" "}
+                  <span className="text-black font-bold">cluster M13, 25,000 light-years</span>{" "}
+                  away.
+                </li>
+                <li>
+                  A pictorial message (pictogram) made of{" "}
+                  <span className="text-black font-bold">
+                    1,679 binary bits
+                  </span>{" "}
+                  (0s and 1s).
+                </li>
+                <li>
+                  The key is the number{" "}
+                  <span className="text-black font-bold">1679=73×23</span>. Arranging
+                  the bits in a{" "}
+                  <span className="text-black font-bold">73×23 grid</span> reveals
+                  the image.
+                </li>
+              </ul>
+
+              {/* Image contents */}
+              <div>
+                <h2 className="font-bold text-lg text-black ">
+                   The image shows:
+                </h2>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li className="text-black font-semibold">Numbers 1–10</li>
+                  <li className="text-black font-semibold">Key elements of life (H, C, N, O, P)</li>
+                  <li className="text-black font-semibold">The DNA double helix</li>
+                  <li className="text-black font-semibold">A human figure, population, and height</li>
+                  <li className="text-black font-semibold">Our Solar System and the Arecibo telescope</li>
+                </ul>
+              </div>
+
+              {/* Problem Statement */}
+              <div>
+                <h2 className="font-semibold text-lg text-bold text-black">
+                   The "Problem Statement"
+                </h2>
+
+                <ol className="list-decimal list-inside space-y-3 ml-4">
+                  <li>
+                    <span className="font-semibold text-black">The Puzzle:</span> For
+                    aliens, the message is a{" "}
+                    <span className="font-semibold text-black">complex puzzle</span>. They must
+                    recognize the binary code, solve the 73×23 math clue, and interpret a
+                    very human-centric image.
+                  </li>
+
+                  <li>
+                    <span className="font-semibold text-black">The Time Lag:</span> The
+                    message will take{" "}
+                    <span className="font-semibold text-black">25,000 years</span> to
+                    arrive. A reply would take another 25,000 years. It is a{" "}
+                    <span className="font-semibold text-black">one-way greeting</span>, not a
+                    conversation.
+                  </li>
+
+                  <li>
+                    <span className="font-semibold text-black">
+                      The Universal Language Problem:
+                    </span>{" "}
+                    The message assumes aliens will understand{" "}
+                    <span className="font-semibold text-black">2D images</span>, our chemistry, and our
+                    biology. This is a huge assumption.
+                  </li>
+
+                  <li>
+                    <span className="font-semibold text-black">
+                      The Safety Debate (METI):
+                    </span>{" "}
+                    Is it safe to announce our existence and location to unknown cosmic
+                    neighbors? This is the core of the{" "}
+                    <span className="font-semibold text-black italic">
+                      "Should we be shouting in the cosmos?"
+                    </span>{" "}
+                    debate.
+                  </li>
+                </ol>
+              </div>
+            
+
+            
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-6 pt-6">
@@ -41,18 +119,18 @@ export default function AboutSection() {
                   className="text-3xl mb-2"
                   style={{ color: "var(--neon-blue)" }}
                 >
-                  305m
+                  1,679
                 </div>
-                <div className="text-gray-600">Primary Dish</div>
+                <div className="text-gray-600">Magic Multiple</div>
               </div>
               <div className="text-center">
                 <div
                   className="text-3xl mb-2"
                   style={{ color: "var(--neon-purple)" }}
                 >
-                  24/7
+                  73×23 
                 </div>
-                <div className="text-gray-600">Operations</div>
+                <div className="text-gray-600">Arecibo Grid</div>
               </div>
             </div>
           </motion.div>
@@ -65,9 +143,9 @@ export default function AboutSection() {
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="relative rounded-lg overflow-hidden shadow-2xl">
+            <div className="relative rounded-[95px] ml-7 overflow-hidden shadow-2xl h-[800px] w-[750px]">
               <img
-                src="https://images.unsplash.com/photo-1708795835241-9bd31ea9dea7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                src={image3}
                 alt="Arecibo 2.0 Radio Telescope"
                 className="w-full h-full object-cover"
               />

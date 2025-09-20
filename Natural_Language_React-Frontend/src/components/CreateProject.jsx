@@ -5,11 +5,13 @@ import Navbar from "./Navbar";
 
 export default function CreateProject({
   colorPalette = {
-    White: "#FFFFFF",
-    Black: "#000000",
-    GrayLight: "#D3D3D3",
-    GrayMedium: "#808080",
-    GrayDark: "#404040",
+    "Black": "#000000", "Electric Blue": "#0000FF", "Neon Purple": "#BF00FF",
+    "Bright Cyan": "#00FFFF", "Vibrant Magenta": "#FF00FF", "Neon Green": "#39FF14",
+    "Hot Pink": "#FF69B4", "Neon Orange": "#FF4500", "Bright Yellow": "#FFFF00",
+    "Electric Lime": "#CCFF00", "Vivid Red": "#FF0000", "Deep Sky Blue": "#00BFFF",
+    "Vivid Violet": "#9F00FF", "Fluorescent Pink": "#FF1493", "Laser Lemon": "#FFFF66",
+    "Screamin' Green": "#66FF66", "Ultra Red": "#FF2400", "Radical Red": "#FF355E",
+    "Vivid Orange": "#FFA500", "Electric Indigo": "#6F00FF"
   },
 }) {
   const navigate = useNavigate();
@@ -23,8 +25,8 @@ export default function CreateProject({
   const [periods, setPeriods] = useState(10);
 
   const [backgroundColor, setBackgroundColor] = useState("#000000");
-  const [positiveColor, setPositiveColor] = useState("#FFFFFF");
-  const [negativeColor, setNegativeColor] = useState("#808080");
+  const [positiveColor, setPositiveColor] = useState("#00FF00");
+  const [negativeColor, setNegativeColor] = useState("#00FF00");
 
   const [loading, setLoading] = useState(false);
   const selectedColorField = useRef("positive");
@@ -43,29 +45,29 @@ export default function CreateProject({
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    
+
     // Set canvas size
     canvas.width = canvas.offsetWidth;
     canvas.height = 200;
-    
+
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Draw waveform
     ctx.strokeStyle = '#58A6FF';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    
+
     const samples = samplesPerWave * periods;
     const amplitude = canvas.height / 4;
     const centerY = canvas.height / 2;
-    
+
     for (let i = 0; i < samples; i++) {
       const x = (i / samples) * canvas.width;
       let y = centerY;
-      
+
       const phase = (i / samplesPerWave) * 2 * Math.PI;
-      
+
       switch (waveType) {
         case 'sine':
           y = centerY + amplitude * Math.sin(phase);
@@ -80,20 +82,20 @@ export default function CreateProject({
           y = centerY + amplitude * (2 * (phase / (2 * Math.PI) - Math.floor(0.5 + phase / (2 * Math.PI))));
           break;
       }
-      
+
       if (i === 0) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
       }
     }
-    
+
     ctx.stroke();
-    
+
     // Add grid
     ctx.strokeStyle = 'rgba(88, 166, 255, 0.1)';
     ctx.lineWidth = 1;
-    
+
     // Horizontal lines
     for (let i = 1; i < 4; i++) {
       const y = (canvas.height / 4) * i;
@@ -102,7 +104,7 @@ export default function CreateProject({
       ctx.lineTo(canvas.width, y);
       ctx.stroke();
     }
-    
+
     // Vertical lines
     for (let i = 1; i < periods; i++) {
       const x = (canvas.width / periods) * i;
@@ -181,14 +183,14 @@ export default function CreateProject({
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-black text-white px-6 py-10 flex justify-center">
+      <div className="min-h-screen bg-white text-black px-6 py-10 flex justify-center">
         <div className="max-w-4xl w-full space-y-8">
           {/* Header */}
           <div className="text-center">
             <h3 className="text-3xl font-bold mb-2 flex items-center justify-center gap-2">
               <FaPlusCircle /> Create New Audio Project
             </h3>
-            <p className="text-gray-400">
+            <p className="text-gray-600">
               Configure project details, upload audio or generate waves, and customize your visualization colors.
             </p>
           </div>
@@ -229,7 +231,7 @@ export default function CreateProject({
                     <NumberInput label="Samples per Wave" value={samplesPerWave} setValue={setSamplesPerWave} />
                     <NumberInput label="Number of Periods" value={periods} setValue={setPeriods} />
                   </div>
-                  
+
                   {/* Wave Preview */}
                   <div className="mt-4">
                     <div className="bg-gray-800 rounded-lg p-4">
@@ -299,7 +301,7 @@ export default function CreateProject({
               <button
                 type="button"
                 onClick={() => navigate("/gallery")}
-                className="px-4 py-2 border border-gray-500 text-gray-300 rounded-lg hover:bg-gray-800 transition"
+                className="px-4 py-2 border border-gray-500 text-gray-500 rounded-lg hover:bg-gray-800 transition"
               >
                 <FaArrowLeft className="inline mr-2" /> Back to Gallery
               </button>

@@ -72,24 +72,24 @@ const ProjectPage = () => {
   // Tailwind reusable classes
   const cardClass = "border border-white/30 rounded p-4 bg-[#111]";
   const btnWhite =
-    "bg-white text-black px-3 py-1 rounded transition hover:bg-blue-500 hover:text-white";
+    "bg-white border text-black px-3 py-1 rounded transition hover:bg-blue-500 hover:text-white";
   const btnGray = "bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded transition";
   const btnRed = "bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition";
   const imgHover =
     "w-full cursor-pointer hover:scale-105 hover:shadow-[0_0_10px_#3b82f6] transition";
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white text-black">
       <Navbar />
 
       <div className="p-6 flex flex-col gap-6">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row justify-between items-center border-b border-white/30 pb-4">
+        <div className="flex flex-col lg:flex-row justify-between items-center border-b border-black pb-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               {project.name}
               {project.is_processing && (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2"></span>
+                <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin ml-2"></span>
               )}
             </h1>
             <p className="text-gray-400 mt-1">
@@ -98,7 +98,7 @@ const ProjectPage = () => {
             </p>
           </div>
 
-          <div className="flex gap-3 mt-3 lg:mt-0">
+          <div className="flex gap-3 mt-3 lg:mt-0 ">
             <button
               onClick={() => navigate(`/visualize/${project.id}`)}
               className={btnWhite}
@@ -119,7 +119,7 @@ const ProjectPage = () => {
 
         {/* Visualizations */}
         <div className={cardClass}>
-          <h2 className="text-xl font-semibold mb-3">Visualizations</h2>
+          <h2 className="text-xl font-semibold mb-3 text-white">Visualizations</h2>
           <div className="flex flex-col lg:flex-row gap-6">
             {project.final_drawing && (
               <div className="flex-1">
@@ -211,7 +211,7 @@ const ProjectPage = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Audio Files */}
           <div className={cardClass + " lg:w-1/3"}>
-            <h2 className="text-xl font-semibold mb-3">Audio Files</h2>
+            <h2 className="text-xl font-semibold mb-3 text-white">Audio Files</h2>
             {project.modified_file && (
               <div>
                 <h6 className="text-gray-300">Modified Audio</h6>
@@ -227,7 +227,7 @@ const ProjectPage = () => {
 
           {/* Project Settings */}
           <div className={cardClass + " lg:w-1/3"}>
-            <h2 className="text-xl font-semibold mb-3">Project Settings</h2>
+            <h2 className="text-xl font-semibold mb-3 text-white">Project Settings</h2>
             <p>
               <span className="text-gray-300">Wave Type:</span>{" "}
               <span className="px-2 py-1 bg-black border border-white/30 rounded">
@@ -249,7 +249,7 @@ const ProjectPage = () => {
 
           {/* API Access */}
           <div className={cardClass + " lg:w-1/3"}>
-            <h2 className="text-xl font-semibold mb-3">API Access</h2>
+            <h2 className="text-xl font-semibold mb-3 text-white">API Access</h2>
             <div className="flex gap-2">
               <input
                 type="text"

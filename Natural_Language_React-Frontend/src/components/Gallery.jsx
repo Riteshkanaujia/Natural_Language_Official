@@ -96,20 +96,20 @@ export default function Gallery() {
   }, [projects, page]);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white text-black">
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl text-white flex items-center gap-2">
+            <h1 className="text-3xl md:text-4xl text-black flex items-center gap-2">
               <FaThLarge /> Project Gallery
             </h1>
             <p className="text-gray-400">Total projects: {totalProjects}</p>
           </div>
           <button
-            className="bg-white hover:bg-blue-600 text-black px-4 py-2 rounded-lg flex items-center gap-2"
+            className="bg-white border hover:bg-blue-600 text-black px-4 py-2 rounded-lg flex items-center gap-2"
             onClick={() => navigate("/create")}
           >
             <FaPlusCircle /> Create New Project

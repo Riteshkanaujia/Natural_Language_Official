@@ -32,25 +32,25 @@ const Navbar = () => {
         <div className="hidden md:flex gap-24">
           <button
             onClick={() => handleScrollOrNavigate("dashboard")}
-            className="text-white hover:underline"
+            className="text-white hover:underline border w-[70px] rounded-lg"
           >
             Home
           </button>
           <button
             onClick={() => handleScrollOrNavigate("about")}
-            className="text-white hover:underline"
+            className="text-white hover:underline border w-[70px] rounded-lg"
           >
             About
           </button>
           <button
             onClick={() => window.location.href="/Gallery"}
-            className="text-white hover:underline"
+            className="text-white hover:underline border w-[70px] rounded-lg"
           >
             Gallery
           </button>
           <button
             onClick={() => handleScrollOrNavigate("contact")}
-            className="text-white hover:underline"
+            className="text-white hover:underline border w-[70px] rounded-lg"
           >
             Contact
           </button>
