@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 const ProjectPage = () => {
   const { id } = useParams();
@@ -281,6 +282,7 @@ const ProjectPage = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

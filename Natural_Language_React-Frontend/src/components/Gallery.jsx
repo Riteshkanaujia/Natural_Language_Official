@@ -1,73 +1,92 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext, useContext } from "react";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
 import {
-  FaThLarge,
-  FaPlusCircle,
-  FaWaveSquare,
-  FaClock,
+  FaPlus,
   FaEye,
   FaChartLine,
   FaTrash,
-  FaAngleDoubleLeft,
-  FaAngleLeft,
-  FaAngleRight,
-  FaAngleDoubleRight,
-  FaMusic,
-  FaCheckCircle,
   FaSpinner,
+  FaSun,
+  FaMoon,
+  FaSquare,
 } from "react-icons/fa";
 
+// ----------------- THEME CONTEXT -----------------
+const ThemeContext = createContext();
+export function useTheme() {
+  return useContext(ThemeContext);
+}
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("light", "dark", "monochrome");
+    root.classList.add(theme);
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <div className={`min-h-screen ${theme === "dark" ? "bg-gray-900 text-white" : theme === "monochrome" ? "bg-gray-100 text-black filter grayscale" : "bg-white text-black"}`}>
+        {children}
+      </div>
+    </ThemeContext.Provider>
+  );
+}
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  return (
+    <div className="flex gap-2">
+      <button
+        onClick={() => setTheme("light")}
+        className={`p-2 rounded ${theme === "light" ? "bg-black text-white" : "bg-gray-100 text-black"}`}
+      >
+        <FaSun />
+      </button>
+      <button
+        onClick={() => setTheme("dark")}
+        className={`p-2 rounded ${theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-100"}`}
+      >
+        <FaMoon />
+      </button>
+      <button
+        onClick={() => setTheme("monochrome")}
+        className={`p-2 rounded ${theme === "monochrome" ? "bg-black text-white" : "bg-gray-100 text-black"}`}
+      >
+        <FaSquare />
+      </button>
+    </div>
+  );
+}
+
+// ----------------- MAIN GALLERY -----------------
 export default function Gallery() {
   const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProjects, setTotalProjects] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
 
   const navigate = useNavigate();
   const backendUrl = "http://localhost:8000";
 
-  // Handle project actions
-  const handleViewProject = (projectId) => {
-    navigate(`/project/${projectId}`);
-  };
-
-  const handleVisualizeProject = (projectId) => {
-    navigate(`/visualize/${projectId}`);
-  };
-
-  const handleDeleteProject = async (projectId, projectName) => {
-    if (window.confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`)) {
-      try {
-        const res = await fetch(`${backendUrl}/api/projects/${projectId}/delete/`, {
-          method: 'DELETE',
-        });
-        
-        if (res.ok) {
-          alert('Project deleted successfully!');
-          fetchProjects(page); // Refresh the current page
-        } else {
-          alert('Failed to delete project. Please try again.');
-        }
-      } catch (err) {
-        console.error('Error deleting project:', err);
-        alert('An error occurred while deleting the project.');
-      }
-    }
-  };
-
-  // Fetch projects from API
+  // ----------------- API -----------------
   const fetchProjects = async (pageNum = 1) => {
     try {
       setLoading(true);
       setError("");
-      const res = await fetch(`http://localhost:8000/api/projects/?page=${pageNum}`);
+      const res = await fetch(`${backendUrl}/api/projects/?page=${pageNum}`);
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       const data = await res.json();
 
       setProjects(data.results || []);
+      setFilteredProjects(data.results || []);
       setTotalPages(data.total_pages || 1);
       setTotalProjects(data.total_projects || 0);
       setPage(pageNum);
@@ -79,12 +98,11 @@ export default function Gallery() {
     }
   };
 
-  // Load projects when page changes
   useEffect(() => {
     fetchProjects(page);
   }, [page]);
 
-  // Auto-refresh processing projects every 5 seconds
+  // Auto-refresh if processing
   useEffect(() => {
     const hasProcessing = projects.some((p) => p.is_processing);
     if (hasProcessing) {
@@ -95,24 +113,96 @@ export default function Gallery() {
     }
   }, [projects, page]);
 
+  // ----------------- SEARCH -----------------
+  useEffect(() => {
+    if (!search.trim()) {
+      setFilteredProjects(projects);
+    } else {
+      const q = search.toLowerCase();
+      setFilteredProjects(
+        projects.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            (p.wave_type && p.wave_type.toLowerCase().includes(q))
+        )
+      );
+    }
+  }, [search, projects]);
+
+  // ----------------- ACTIONS -----------------
+  const handleViewProject = (id) => navigate(`/project/${id}`);
+  const handleVisualizeProject = (id) => navigate(`/visualize/${id}`);
+  const handleDeleteProject = async (id, name) => {
+    if (!window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    try {
+      const res = await fetch(`${backendUrl}/api/projects/${id}/delete/`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        alert("Deleted!");
+        fetchProjects(page);
+      } else {
+        alert("Failed to delete project.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting project.");
+    }
+  };
+
+  // ----------------- UI HELPERS -----------------
+  
+
+  // ----------------- RENDER -----------------
   return (
-    <div className="min-h-screen bg-white text-black">
+    <ThemeProvider>
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl text-black flex items-center gap-2">
-              <FaThLarge /> Project Gallery
+            <h1 className="text-3xl md:text-4xl font-bold">
+              Research Projects{" "}
+              <span className="text-gray-500">({totalProjects})</span>
             </h1>
-            <p className="text-gray-400">Total projects: {totalProjects}</p>
+            <p className="text-gray-500">
+              Radio astronomy data analysis and visualization projects
+            </p>
           </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button
+              className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-800"
+              onClick={() => navigate("/create")}
+            >
+              <FaPlus /> New Project
+            </button>
+          </div>
+        </div>
+
+        {/* Search & View Mode */}
+        <div className="flex items-center gap-3 mb-8">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search projects..."
+            className="flex-1 border px-4 py-2 rounded-lg"
+          />
           <button
-            className="bg-white border hover:bg-blue-600 text-black px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={() => navigate("/create")}
+            onClick={() => setViewMode("grid")}
+            className={`border px-3 py-2 rounded-lg ${viewMode === "grid" ? "bg-black" : "hover:bg-gray-100"
+              }`}
           >
-            <FaPlusCircle /> Create New Project
+            ⬜
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={`border px-3 py-2 rounded-lg ${viewMode === "list" ? "bg-black text-white" : "hover:bg-gray-100"
+              }`}
+          >
+            ☰
           </button>
         </div>
 
@@ -132,165 +222,105 @@ export default function Gallery() {
         )}
 
         {/* Projects */}
-        {!loading && !error && projects.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
+        {!loading && !error && filteredProjects.length > 0 && (
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                : "space-y-4"
+            }
+          >
+            {filteredProjects.map((project) => (
               <div
                 key={project.id}
-                className="bg-gray-900 rounded-lg shadow-lg overflow-hidden flex flex-col"
+                className={`bg-white border rounded-lg shadow hover:shadow-lg overflow-hidden ${viewMode === "list" 
+                  }`}
               >
-                {/* Card header */}
-                <div className="flex justify-between items-center px-4 py-2 border-b border-gray-700">
-                  <h6 className="text-blue-500 font-medium">{project.name}</h6>
-                  {project.is_processing ? (
-                    <span
-                      className="animate-pulse text-yellow-400"
-                      title="Processing..."
-                    >
-                      Processing...
+                {/* Status */}
+                
+
+                {/* Preview */}
+                {project.final_drawing ? (
+                  <img
+                    src={`${backendUrl}${project.final_drawing}`}
+                    alt="Wave visualization"
+                    className={`${viewMode === "list"
+                      ? "w-full h-auto object-cover"
+                      : "w-full h-35 object-cover"
+                      }`}
+                    onClick={() => window.open(`${backendUrl}${project.final_drawing}`, '_blank')}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div
+                    className={`${viewMode === "list"
+                      ? "w-48 h-32"
+                      : "w-full h-40"
+                      } bg-gray-200 flex items-center justify-center text-gray-500`}
+                  >
+                    No Preview
+                  </div>
+                )}
+
+                {/* Info */}
+                <div className="p-4 flex-1">
+                  <h3 className="font-semibold text-lg">{project.name}</h3>
+                  <div className="flex justify-between items-center text-sm text-gray-500 mt-1">
+                    <span className="border px-2 py-0.5 rounded">
+                      {project.get_wave_type_display || project.wave_type}
                     </span>
-                  ) : (
-                    <FaCheckCircle className="text-green-500" />
-                  )}
-                </div>
-
-                {/* Card body */}
-                <div className="p-4 flex-1 flex flex-col justify-between">
-                  <div className="mb-3 text-gray-400 text-sm">
-                    <div className="flex items-center gap-2">
-                      <FaWaveSquare /> {project.get_wave_type_display || project.wave_type}
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <FaClock />{" "}
+                    <span>
                       {new Date(project.created_at).toLocaleString()}
-                    </div>
+                    </span>
                   </div>
 
-                  {project.description && (
-                    <p className="text-gray-300 mb-3">
-                      {project.description.split(" ").slice(0, 15).join(" ")}...
-                    </p>
-                  )}
-
-                  <div className="mb-3">
-                    <small className="text-gray-400 block mb-1">Colors:</small>
-                    <span
-                      className="inline-block w-5 h-5 mr-1 rounded"
-                      style={{ backgroundColor: project.background_color }}
-                    />
-                    <span
-                      className="inline-block w-5 h-5 mr-1 rounded"
-                      style={{ backgroundColor: project.positive_color }}
-                    />
-                    <span
-                      className="inline-block w-5 h-5 mr-1 rounded"
-                      style={{ backgroundColor: project.negative_color }}
-                    />
-                  </div>
-
-                  {project.final_drawing && (
-                    <div className="text-center mb-3">
-                      <img
-                        src={`${backendUrl}${project.final_drawing}`}
-                        alt="Wave visualization"
-                        className="mx-auto max-h-24 object-contain cursor-pointer hover:scale-105 transition-transform"
-                        onClick={() => window.open(`${backendUrl}${project.final_drawing}`, '_blank')}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Card footer */}
-                <div className="flex gap-2 px-4 py-2 border-t border-gray-700">
-                  <button 
-                    onClick={() => handleViewProject(project.id)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded flex-1 flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <FaEye /> View
-                  </button>
-                  {!project.is_processing && (
-                    <button 
-                      onClick={() => handleVisualizeProject(project.id)}
-                      className="border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-3 py-1 rounded flex-1 flex items-center justify-center gap-2 transition-colors"
+                  {/* Footer */}
+                  <div className="flex gap-2 mt-4 border-t pt-4">
+                    <button
+                      onClick={() => handleViewProject(project.id)}
+                      className="flex-1 bg-black text-white px-3 py-2 rounded hover:bg-gray-800 flex items-center justify-center gap-2"
                     >
-                      <FaChartLine /> Visualize
+                      <FaEye /> View
                     </button>
-                  )}
-                  <button 
-                    onClick={() => handleDeleteProject(project.id, project.name)}
-                    className="border border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-3 py-1 rounded flex-1 flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <FaTrash /> Delete
-                  </button>
+                    {!project.is_processing && (
+                      <button
+                        onClick={() => handleVisualizeProject(project.id)}
+                        className="flex-1 border px-3 py-2 rounded hover:bg-gray-100 flex items-center justify-center gap-2"
+                      >
+                        <FaChartLine /> Analyze
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDeleteProject(project.id, project.name)}
+                      className="flex-1 border border-red-500 text-red-500 px-3 py-2 rounded hover:bg-red-500 hover:text-white flex items-center justify-center gap-2"
+                    >
+                      <FaTrash /> Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* No projects */}
-        {!loading && !error && projects.length === 0 && (
-          <div className="text-center py-20 text-gray-400">
-            <FaMusic className="mx-auto text-6xl mb-4" />
-            <h3 className="text-2xl mb-2">No projects yet</h3>
-            <p className="mb-4">
-              Create your first audio wave visualization project!
-            </p>
+        {/* Empty */}
+        {!loading && !error && filteredProjects.length === 0 && (
+          <div className="text-center py-20 text-gray-600">
+            <h3 className="text-2xl mb-2">No projects found</h3>
+            <p className="mb-4">Try a different search or create a new one!</p>
             <button
-              className="bg-white hover:bg-blue-500 text-black px-6 py-3 rounded-lg flex items-center gap-2 mx-auto"
+              className="bg-black text-white px-6 py-3 rounded-lg flex items-center gap-2 mx-auto hover:bg-gray-800"
               onClick={() => navigate("/create")}
             >
-              <FaPlusCircle /> Create Your First Project
+              <FaPlus /> Create Project
             </button>
           </div>
         )}
-
-        {/* Pagination */}
-        {!loading && !error && totalPages > 1 && (
-          <div className="flex justify-center mt-8 gap-2">
-            {page > 1 && (
-              <>
-                <button
-                  onClick={() => setPage(1)}
-                  className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600"
-                >
-                  <FaAngleDoubleLeft />
-                </button>
-                <button
-                  onClick={() => setPage(page - 1)}
-                  className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600"
-                >
-                  <FaAngleLeft />
-                </button>
-              </>
-            )}
-
-            <span className="px-3 py-1 bg-white text-black rounded">
-              {page}
-            </span>
-
-            {page < totalPages && (
-              <>
-                <button
-                  onClick={() => setPage(page + 1)}
-                  className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600"
-                >
-                  <FaAngleRight />
-                </button>
-                <button
-                  onClick={() => setPage(totalPages)}
-                  className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600"
-                >
-                  <FaAngleDoubleRight />
-                </button>
-              </>
-            )}
-          </div>
-        )}
       </div>
-    </div>
+
+
+    </ThemeProvider>
   );
 }

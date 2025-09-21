@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaPlusCircle, FaArrowLeft, FaRocket } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 export default function CreateProject({
   colorPalette = {
@@ -317,6 +318,7 @@ export default function CreateProject({
           </form>
         </div>
       </div>
+      <Footer />
     </>
   );
 }
@@ -419,6 +421,7 @@ function ColorPicker({ label, value, onChange, onFocus }) {
             focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
+      
     </div>
   );
 }
