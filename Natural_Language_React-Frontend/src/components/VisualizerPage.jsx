@@ -368,7 +368,7 @@ export default function VisualizerPage() {
     const offset = 0.0; // Like Django script
 
     // Draw original waveform faintly (like Django script)
-    ctx.strokeStyle = 'rgba(64, 128, 255, 0.15)';
+    ctx.strokeStyle = 'rgba(64, 128, 255, 0.35)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let i = 0; i < audioData.audio_data.length; i++) {
@@ -647,16 +647,6 @@ export default function VisualizerPage() {
       {/* Canvas Section */}
       <div className="space-y-6">
         <div className="bg-white dark:bg-gray-800 shadow rounded-2xl p-4">
-          <h5 className="font-semibold text-gray-700 dark:text-gray-200">
-            Waveform
-          </h5>
-          <canvas
-            ref={waveformRef}
-            className="w-full h-52 mt-3 rounded-lg border dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
-          />
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 shadow rounded-2xl p-4">
           <div className="flex items-center justify-between">
             <h5 className="font-semibold text-gray-700 dark:text-gray-200">
               Interactive Envelope Editor
@@ -716,8 +706,8 @@ export default function VisualizerPage() {
           </div>
           <canvas
             ref={envelopeRef}
-            className="w-full h-72 mt-3 rounded-lg border dark:border-gray-700 
-                       bg-gray-50 dark:bg-gray-900 cursor-crosshair"
+            className="w-full  mt-6 mx-auto rounded-lg border dark:border-gray-700 
+                       bg-gray-50 dark:bg-gray-900 cursor-crosshair max-w-[1600px] h-[32rem]"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -812,7 +802,7 @@ export default function VisualizerPage() {
         )}
       </audio>
     </div>
-    <Footer />
+    {/* <Footer /> */}
     </>
   );
 }
